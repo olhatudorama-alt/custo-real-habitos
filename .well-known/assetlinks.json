@@ -1,1 +1,9 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "io.github.olhatudorama_alt.twa",
+        "sha256_cert_fingerprints": ["B2:85:3C:F7:42:A5:DD:C2:F4:86:76:66:E4:86:C8:72:FB:E0:54:4D:51:FE:DF:8F:F3:33:A8:83:77:32:B5:41"]
+      }
+    }]
 
