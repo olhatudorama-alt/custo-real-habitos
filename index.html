@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0a0a0a" />
+  <meta name="description" content="Descubra o custo real dos seus hábitos em dinheiro, saúde e tempo." />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <title>Custo Real de Hábitos</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg:       #0a0a0a;
+      --bg2:      #111111;
+      --bg3:      #1a1a1a;
+      --border:   #2a2a2a;
+      --accent:   #ff3d00;
+      --accent2:  #ff8c00;
+      --warn:     #ffd600;
+      --ok:       #00e676;
+      --text:     #f0f0f0;
+      --muted:    #777;
+      --card:     #161616;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ─── HEADER ─── */
+    header {
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      padding: 18px 20px 14px;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    header h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem;
+      letter-spacing: 3px;
+      color: var(--accent);
+      line-height: 1;
+    }
+    header p {
+      font-size: 0.72rem;
+      color: var(--muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-top: 3px;
+    }
+
+    /* ─── NAV TABS ─── */
+    nav {
+      display: flex;
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+    }
+    nav button {
+      flex: 1;
+      min-width: 80px;
+      padding: 12px 6px;
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      color: var(--muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    nav button.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    /* ─── PAGES ─── */
+    .page { display: none; padding: 20px 16px 100px; max-width: 480px; margin: 0 auto; }
+    .page.active { display: block; }
+
+    /* ─── SECTION TITLE ─── */
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.4rem;
+      letter-spacing: 2px;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .section-sub {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+
+    /* ─── HABIT FORM ─── */
+    .form-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    .form-row { margin-bottom: 14px; }
+    label {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    input, select {
+      width: 100%;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      padding: 10px 12px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input:focus, select:focus { border-color: var(--accent); }
+    input[type=number] { -moz-appearance: textfield; }
+    input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    /* ─── BUTTONS ─── */
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      border-radius: 10px;
+      border: none;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem;
+      letter-spacing: 2px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+    .btn-primary:hover { background: #e63500; }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.85rem;
+      letter-spacing: 1px;
+      margin-top: 8px;
+    }
+    .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-support {
+      background: linear-gradient(135deg, #ff8c00, #ff3d00);
+      color: #fff;
+    }
+
+    /* ─── HABIT LIST ─── */
+    .habit-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      animation: fadeIn 0.3s ease;
+    }
+    .habit-item .habit-name {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    .habit-item .habit-freq {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .habit-item .habit-cost {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.2rem;
+      color: var(--accent);
+      text-align: right;
+    }
+    .habit-item .habit-cost span {
+      font-size: 0.65rem;
+      color: var(--muted);
+      display: block;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 400;
+    }
+    .del-btn {
+      background: none;
+      border: none;
+      color: var(--border);
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 4px 8px;
+      margin-left: 8px;
+      transition: color 0.2s;
+    }
+    .del-btn:hover { color: var(--accent); }
+
+    /* ─── RESULTS ─── */
+    .big-number {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 3.5rem;
+      line-height: 1;
+      color: var(--accent);
+    }
+    .big-label {
+      font-size: 0.72rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 2px;
+      margin-bottom: 20px;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .result-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      animation: fadeIn 0.4s ease;
+    }
+    .result-card.full { grid-column: 1 / -1; }
+    .result-card .rc-value {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.8rem;
+      line-height: 1.1;
+    }
+    .result-card .rc-label {
+      font-size: 0.68rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-top: 3px;
+    }
+    .money { color: var(--accent); }
+    .health { color: var(--warn); }
+    .time { color: var(--ok); }
+
+    .period-tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+    .period-tab {
+      flex: 1;
+      padding: 8px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .period-tab.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    /* ─── INSIGHT BOX ─── */
+    .insight {
+      background: linear-gradient(135deg, #1a0a00, #1a1000);
+      border: 1px solid #3a2000;
+      border-left: 3px solid var(--accent2);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 14px;
+      font-size: 0.88rem;
+      line-height: 1.5;
+      color: #ddd;
+    }
+    .insight strong { color: var(--accent2); }
+
+    /* ─── EMPTY STATE ─── */
+    .empty {
+      text-align: center;
+      padding: 50px 20px;
+      color: var(--muted);
+    }
+    .empty .empty-icon { font-size: 3rem; margin-bottom: 12px; }
+    .empty p { font-size: 0.9rem; line-height: 1.6; }
+
+    /* ─── APOIO PAGE ─── */
+    .support-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px 20px;
+      margin-bottom: 14px;
+      text-align: center;
+    }
+    .support-card .s-icon { font-size: 2.5rem; margin-bottom: 10px; }
+    .support-card h3 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.3rem;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+    }
+    .support-card p {
+      font-size: 0.83rem;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+
+    .ad-box {
+      background: var(--bg3);
+      border: 1px dashed var(--border);
+      border-radius: 10px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      font-size: 0.75rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 24px 0;
+    }
+
+    /* ─── ANIMATIONS ─── */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .shake {
+      animation: shake 0.4s ease;
+    }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+
+    /* ─── BOTTOM BAR AD ─── */
+    .bottom-ad {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      font-size: 0.72rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      z-index: 99;
+    }
+
+    /* ─── SCROLLBAR ─── */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>⚡ Custo Real</h1>
+  <p>O preço verdadeiro dos seus hábitos</p>
+</header>
+
+<nav>
+  <button class="active" onclick="goTo('adicionar')">➕ Adicionar</button>
+  <button onclick="goTo('habitos')">📋 Hábitos</button>
+  <button onclick="goTo('resultado')">📊 Resultado</button>
+  <button onclick="goTo('apoio')">❤️ Apoio</button>
+</nav>
+
+<!-- ─── PAGE: ADICIONAR ─── -->
+<div id="page-adicionar" class="page active">
+  <br>
+  <div class="section-title">Novo Hábito</div>
+  <div class="section-sub">Registre o que você faz e descubra o custo real</div>
+
+  <div class="form-card">
+    <div class="form-row">
+      <label>Nome do hábito</label>
+      <input id="f-nome" type="text" placeholder="Ex: Cigarro, Café, Fast food, Netflix..." maxlength="40" />
+    </div>
+    <div class="form-row row2">
+      <div>
+        <label>Frequência</label>
+        <select id="f-freq">
+          <option value="1">Diário</option>
+          <option value="7">Semanal</option>
+          <option value="30">Mensal</option>
+        </select>
+      </div>
+      <div>
+        <label>Vezes por período</label>
+        <input id="f-vezes" type="number" min="1" value="1" placeholder="1" />
+      </div>
+    </div>
+    <div class="form-row row2">
+      <div>
+        <label>💰 Custo (R$)</label>
+        <input id="f-dinheiro" type="number" min="0" step="0.01" placeholder="0,00" />
+      </div>
+      <div>
+        <label>⏱ Tempo (min)</label>
+        <input id="f-tempo" type="number" min="0" placeholder="0" />
+      </div>
+    </div>
+    <div class="form-row">
+      <label>🫀 Impacto na saúde</label>
+      <select id="f-saude">
+        <option value="0">Neutro (sem impacto)</option>
+        <option value="1">Leve (pequeno risco)</option>
+        <option value="2">Moderado (risco real)</option>
+        <option value="3">Alto (dano significativo)</option>
+        <option value="4">Muito Alto (dano grave)</option>
+      </select>
+    </div>
+    <button class="btn btn-primary" onclick="adicionarHabito()">REGISTRAR HÁBITO</button>
+  </div>
+
+  <div class="insight">
+    <strong>Como usar:</strong> Preencha cada hábito com custo financeiro, tempo gasto e impacto na saúde. Vá em <strong>Resultado</strong> para ver a projeção real ao longo dos anos.
+  </div>
+</div>
+
+<!-- ─── PAGE: HÁBITOS ─── -->
+<div id="page-habitos" class="page">
+  <br>
+  <div class="section-title">Seus Hábitos</div>
+  <div class="section-sub">Toque no ✕ para remover um hábito</div>
+  <div id="lista-habitos">
+    <div class="empty">
+      <div class="empty-icon">🌀</div>
+      <p>Nenhum hábito registrado ainda.<br>Adicione seu primeiro na aba anterior.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ─── PAGE: RESULTADO ─── -->
+<div id="page-resultado" class="page">
+  <br>
+  <div class="section-title">Impacto Real</div>
+  <div class="section-sub">Quanto custam seus hábitos ao longo do tempo</div>
+
+  <div class="period-tabs">
+    <button class="period-tab active" onclick="setPeriod(1, this)">1 ANO</button>
+    <button class="period-tab" onclick="setPeriod(5, this)">5 ANOS</button>
+    <button class="period-tab" onclick="setPeriod(20, this)">20 ANOS</button>
+  </div>
+
+  <div id="resultado-conteudo">
+    <div class="empty">
+      <div class="empty-icon">📊</div>
+      <p>Adicione hábitos para ver<br>o impacto real calculado aqui.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ─── PAGE: APOIO ─── -->
+<div id="page-apoio" class="page">
+  <br>
+  <div class="section-title">Apoie o App</div>
+  <div class="section-sub">Este app é 100% gratuito e sem coleta de dados</div>
+
+  <div class="support-card">
+    <div class="s-icon">📺</div>
+    <h3>Veja um Anúncio</h3>
+    <p>Assistir a um anúncio é gratuito para você e nos ajuda a manter o app funcionando e lançar novas versões melhoradas.</p>
+    <button class="btn btn-primary" onclick="simularAd()">▶ ASSISTIR UM ANÚNCIO</button>
+  </div>
+
+  <div class="support-card">
+    <div class="s-icon">☕</div>
+    <h3>Doação Voluntária</h3>
+    <p>Este app foi feito com dedicação para ajudar pessoas reais. Se ele te ajudou de alguma forma, uma contribuição — mesmo pequena — faz diferença para continuar desenvolvendo novos apps gratuitos.</p>
+    <button class="btn btn-support" onclick="abrirDoacao()">💛 QUERO CONTRIBUIR</button>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="insight">
+    <strong>Promessa do desenvolvedor:</strong> Este app nunca pedirá dados pessoais. Tudo que você registra fica apenas no seu celular, nunca em servidores externos.
+  </div>
+
+  <div class="support-card" style="text-align:left; padding: 16px;">
+    <p style="font-size:0.8rem; color: var(--muted); margin-bottom:0;">
+      📱 Versão 1.0 &nbsp;|&nbsp; Feito no Brasil 🇧🇷<br>
+      Suas contribuições financiam novos apps gratuitos que vão te ajudar ainda mais.
+    </p>
+  </div>
+</div>
+
+<!-- ─── BOTTOM AD BANNER ─── -->
+<div class="bottom-ad" id="bottom-ad">
+  <span>[ espaço reservado para anúncio — AdMob ]</span>
+</div>
+
+<!-- ─── AD MODAL ─── -->
+<div id="ad-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.92); z-index:999; align-items:center; justify-content:center; flex-direction:column; text-align:center; padding:30px;">
+  <div style="background:var(--card); border:1px solid var(--border); border-radius:16px; padding:32px 24px; max-width:340px; width:100%;">
+    <div style="font-size:2rem; margin-bottom:12px;">📺</div>
+    <div style="font-family:'Bebas Neue',sans-serif; font-size:1.5rem; letter-spacing:2px; margin-bottom:8px;">ANÚNCIO</div>
+    <div style="font-size:0.8rem; color:var(--muted); margin-bottom:20px;">[ Aqui será exibido o anúncio recompensado do AdMob ]</div>
+    <div id="ad-timer" style="font-family:'Bebas Neue',sans-serif; font-size:3rem; color:var(--accent); margin-bottom:16px;">5</div>
+    <div style="font-size:0.78rem; color:var(--muted); margin-bottom:20px;">Obrigado por nos apoiar! ❤️</div>
+    <button id="ad-close" class="btn btn-primary" onclick="fecharAd()" disabled style="opacity:0.4;">AGUARDE...</button>
+  </div>
+</div>
+
+<script>
+  // ─── STATE ───
+  let habitos = JSON.parse(localStorage.getItem('habitos') || '[]');
+  let periodoAtual = 1;
+
+  // ─── NAV ───
+  function goTo(page) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+    document.getElementById('page-' + page).classList.add('active');
+    event.currentTarget.classList.add('active');
+    if (page === 'habitos') renderHabitos();
+    if (page === 'resultado') renderResultado();
+  }
+
+  // ─── ADICIONAR ───
+  function adicionarHabito() {
+    const nome    = document.getElementById('f-nome').value.trim();
+    const freq    = parseInt(document.getElementById('f-freq').value);
+    const vezes   = parseFloat(document.getElementById('f-vezes').value) || 1;
+    const din     = parseFloat(document.getElementById('f-dinheiro').value) || 0;
+    const tempo   = parseFloat(document.getElementById('f-tempo').value) || 0;
+    const saude   = parseInt(document.getElementById('f-saude').value);
+
+    if (!nome) {
+      document.getElementById('f-nome').classList.add('shake');
+      setTimeout(() => document.getElementById('f-nome').classList.remove('shake'), 500);
+      return;
+    }
+
+    // normaliza para por dia
+    const porDia = vezes / freq;
+
+    habitos.push({ id: Date.now(), nome, porDia, din, tempo, saude });
+    salvar();
+
+    document.getElementById('f-nome').value = '';
+    document.getElementById('f-dinheiro').value = '';
+    document.getElementById('f-tempo').value = '';
+    document.getElementById('f-saude').value = '0';
+    document.getElementById('f-vezes').value = '1';
+
+    showToast('✅ Hábito registrado!');
+  }
+
+  // ─── SALVAR ───
+  function salvar() {
+    localStorage.setItem('habitos', JSON.stringify(habitos));
+  }
+
+  // ─── RENDER HÁBITOS ───
+  function renderHabitos() {
+    const el = document.getElementById('lista-habitos');
+    if (habitos.length === 0) {
+      el.innerHTML = `<div class="empty"><div class="empty-icon">🌀</div><p>Nenhum hábito registrado ainda.</p></div>`;
+      return;
+    }
+    el.innerHTML = habitos.map(h => {
+      const dinMes = h.din * h.porDia * 30;
+      return `
+        <div class="habit-item">
+          <div>
+            <div class="habit-name">${h.nome}</div>
+            <div class="habit-freq">
+              ${(h.din > 0 ? '💰 R$' + h.din.toFixed(2) : '')}
+              ${(h.tempo > 0 ? ' · ⏱ ' + h.tempo + 'min' : '')}
+              · ${saudeLabel(h.saude)}
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:4px;">
+            <div class="habit-cost">
+              ${dinMes > 0 ? 'R$' + dinMes.toFixed(0) : '—'}
+              <span>${dinMes > 0 ? '/mês' : 'sem custo'}</span>
+            </div>
+            <button class="del-btn" onclick="removerHabito(${h.id})">✕</button>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function saudeLabel(v) {
+    return ['🟢 Neutro','🟡 Leve','🟠 Moderado','🔴 Alto','💀 Grave'][v] || '';
+  }
+
+  function removerHabito(id) {
+    habitos = habitos.filter(h => h.id !== id);
+    salvar();
+    renderHabitos();
+  }
+
+  // ─── RENDER RESULTADO ───
+  function setPeriod(anos, btn) {
+    periodoAtual = anos;
+    document.querySelectorAll('.period-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderResultado();
+  }
+
+  function renderResultado() {
+    const el = document.getElementById('resultado-conteudo');
+    if (habitos.length === 0) {
+      el.innerHTML = `<div class="empty"><div class="empty-icon">📊</div><p>Adicione hábitos para ver<br>o impacto real calculado aqui.</p></div>`;
+      return;
+    }
+
+    const dias = periodoAtual * 365;
+    let totalDin = 0, totalTempo = 0, totalSaude = 0;
+    habitos.forEach(h => {
+      totalDin    += h.din * h.porDia * dias;
+      totalTempo  += h.tempo * h.porDia * dias; // em minutos
+      totalSaude  += h.saude * h.porDia * dias;
+    });
+
+    const totalHoras = totalTempo / 60;
+    const totalDias  = totalHoras / 24;
+
+    const saudeScore = Math.min(100, (totalSaude / (habitos.length * dias * 4)) * 100);
+    const saudeCor   = saudeScore < 20 ? 'var(--ok)' : saudeScore < 50 ? 'var(--warn)' : 'var(--accent)';
+    const saudeTxt   = saudeScore < 20 ? 'Baixo risco' : saudeScore < 50 ? 'Risco moderado' : 'Risco elevado';
+
+    // insight inteligente
+    let insights = [];
+    habitos.forEach(h => {
+      const gastoDin = h.din * h.porDia * dias;
+      if (gastoDin > 5000) insights.push(`<strong>${h.nome}</strong> vai custar R$${gastoDin.toFixed(0)} em ${periodoAtual} ano${periodoAtual>1?'s':''}.`);
+    });
+    const horasAno = totalTempo * 365 / 60;
+    if (horasAno > 200) insights.push(`Você gasta <strong>${horasAno.toFixed(0)} horas por ano</strong> com esses hábitos — equivalente a ${(horasAno/8).toFixed(0)} dias de trabalho.`);
+
+    el.innerHTML = `
+      <div class="result-grid">
+        <div class="result-card full">
+          <div class="rc-label">💰 Custo financeiro total</div>
+          <div class="rc-value money">R$ ${formatNum(totalDin)}</div>
+        </div>
+        <div class="result-card">
+          <div class="rc-label">⏱ Tempo gasto</div>
+          <div class="rc-value time">${totalDias > 1 ? totalDias.toFixed(1) + ' dias' : totalHoras.toFixed(1) + ' h'}</div>
+        </div>
+        <div class="result-card">
+          <div class="rc-label">🫀 Risco à saúde</div>
+          <div class="rc-value" style="color:${saudeCor}">${saudeTxt}</div>
+        </div>
+      </div>
+
+      ${insights.length > 0 ? `<div class="insight">💡 ${insights.join('<br>')}</div>` : ''}
+
+      <div class="insight" style="background:#0a1a00; border-color:#1a3a00; border-left-color: var(--ok);">
+        <strong>E se você mudasse agora?</strong><br>
+        Eliminando os hábitos de maior custo, você poderia economizar até <strong>R$ ${formatNum(totalDin * 0.6)}</strong> e recuperar <strong>${(totalHoras * 0.6).toFixed(0)} horas</strong> em ${periodoAtual} ano${periodoAtual>1?'s':''}.
+      </div>
+    `;
+  }
+
+  function formatNum(n) {
+    if (n >= 1000000) return (n/1000000).toFixed(1) + 'M';
+    if (n >= 1000)    return (n/1000).toFixed(1) + 'k';
+    return n.toFixed(0);
+  }
+
+  // ─── TOAST ───
+  function showToast(msg) {
+    const t = document.createElement('div');
+    t.textContent = msg;
+    Object.assign(t.style, {
+      position:'fixed', bottom:'80px', left:'50%', transform:'translateX(-50%)',
+      background:'#222', color:'#fff', padding:'10px 20px', borderRadius:'20px',
+      fontSize:'0.85rem', zIndex:'9999', whiteSpace:'nowrap',
+      boxShadow:'0 4px 20px rgba(0,0,0,0.5)', animation:'fadeIn 0.3s ease'
+    });
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 2500);
+  }
+
+  // ─── AD MODAL ───
+  function simularAd() {
+    const modal = document.getElementById('ad-modal');
+    modal.style.display = 'flex';
+    let count = 5;
+    const timer = document.getElementById('ad-timer');
+    const btn   = document.getElementById('ad-close');
+    const iv = setInterval(() => {
+      count--;
+      timer.textContent = count;
+      if (count <= 0) {
+        clearInterval(iv);
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        btn.textContent = '✅ OBRIGADO! FECHAR';
+      }
+    }, 1000);
+  }
+
+  function fecharAd() {
+    document.getElementById('ad-modal').style.display = 'none';
+    document.getElementById('ad-close').disabled = true;
+    document.getElementById('ad-close').style.opacity = '0.4';
+    document.getElementById('ad-close').textContent = 'AGUARDE...';
+    document.getElementById('ad-timer').textContent = '5';
+    showToast('❤️ Obrigado pelo apoio!');
+  }
+
+  function abrirDoacao() {
+    // Substituir pela URL real do seu site de doação
+    alert('Em breve: página de contribuição voluntária.\n\nObrigado pelo seu interesse em apoiar! ❤️');
+  }
+
+  // ─── PWA SERVICE WORKER ───
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
+</script>
+</body>
+</html>
